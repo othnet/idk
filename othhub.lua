@@ -13,6 +13,9 @@ local MAX_PHRASE_LENGTH = 20
 local PICKUP_WAIT = 1.25
 local DOTS_ENABLED = true
 
+local selectedCategory = "Normal"
+local selectedPickupCategory = "Smooth"
+
 local executionSound = Instance.new("Sound")
 executionSound.Name = "OthHubExecutionSound"
 executionSound.SoundId = "rbxassetid://2866718318"
@@ -441,6 +444,7 @@ local pickupButton
 local pickupPreview
 local ahhhButton
 local ahhhStatus
+local colorsParagraph
 
 local function setElementText(element, text)
     if not element then
@@ -854,12 +858,54 @@ end
 
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
+local OthTheme = {
+    TextColor = Color3.fromRGB(240, 236, 255),
+
+    Background = Color3.fromRGB(14, 12, 22),
+    Topbar = Color3.fromRGB(22, 18, 36),
+    Shadow = Color3.fromRGB(8, 6, 14),
+
+    NotificationBackground = Color3.fromRGB(20, 16, 32),
+    NotificationActionsBackground = Color3.fromRGB(190, 120, 255),
+
+    TabBackground = Color3.fromRGB(30, 24, 48),
+    TabStroke = Color3.fromRGB(60, 46, 96),
+    TabBackgroundSelected = Color3.fromRGB(176, 108, 255),
+    TabTextColor = Color3.fromRGB(190, 180, 220),
+    SelectedTabTextColor = Color3.fromRGB(18, 12, 30),
+
+    ElementBackground = Color3.fromRGB(26, 22, 40),
+    ElementBackgroundHover = Color3.fromRGB(36, 30, 56),
+    SecondaryElementBackground = Color3.fromRGB(20, 17, 32),
+    ElementStroke = Color3.fromRGB(58, 46, 92),
+    SecondaryElementStroke = Color3.fromRGB(46, 38, 74),
+
+    SliderBackground = Color3.fromRGB(70, 44, 120),
+    SliderProgress = Color3.fromRGB(196, 120, 255),
+    SliderStroke = Color3.fromRGB(220, 160, 255),
+
+    ToggleBackground = Color3.fromRGB(22, 18, 34),
+    ToggleEnabled = Color3.fromRGB(196, 120, 255),
+    ToggleDisabled = Color3.fromRGB(90, 80, 110),
+    ToggleEnabledStroke = Color3.fromRGB(225, 170, 255),
+    ToggleDisabledStroke = Color3.fromRGB(110, 100, 130),
+    ToggleEnabledOuterStroke = Color3.fromRGB(110, 70, 170),
+    ToggleDisabledOuterStroke = Color3.fromRGB(50, 44, 66),
+
+    DropdownSelected = Color3.fromRGB(48, 36, 78),
+    DropdownUnselected = Color3.fromRGB(26, 22, 40),
+
+    InputBackground = Color3.fromRGB(20, 17, 32),
+    InputStroke = Color3.fromRGB(80, 60, 130),
+    PlaceholderColor = Color3.fromRGB(140, 128, 170)
+}
+
 local Window = Rayfield:CreateWindow({
-    Name = "OthHub V1",
-    Icon = 0,
-    LoadingTitle = "OthHub",
-    LoadingSubtitle = "by oth",
-    Theme = "Default",
+    Name = "OthHub  ✦  V1",
+    Icon = "sparkles",
+    LoadingTitle = "OthHub ✦",
+    LoadingSubtitle = "made with love by oth",
+    Theme = OthTheme,
     ToggleUIKeybind = "K",
     DisableRayfieldPrompts = false,
     DisableBuildWarnings = false,
@@ -870,61 +916,44 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
-local SlowTypeTab = Window:CreateTab("Slow Type")
-local ColorsTab = Window:CreateTab("Colors")
-local ExtraTab = Window:CreateTab("Extra")
-local PickupTab = Window:CreateTab("Pickup Lines")
-local SettingsTab = Window:CreateTab("Settings")
-
-local sayButton
-local randomButton
-local pickupButton
-local pickupPreview
-local ahhhButton
-local ahhhStatus
-local colorsParagraph
-
-local function setElementText(element, text)
-    if not element then
-        return
-    end
-
+local function notify(title, content, icon)
     pcall(function()
-        element:Set(text)
+        Rayfield:Notify({
+            Title = title,
+            Content = content,
+            Duration = 3,
+            Image = icon or "sparkles"
+        })
     end)
 end
 
-function setSayButton(text)
-    setElementText(sayButton, text)
-end
+local HomeTab = Window:CreateTab("Home", "house")
+local SlowTypeTab = Window:CreateTab("Slow Type", "message-square-text")
+local PickupTab = Window:CreateTab("Pickup Lines", "heart")
+local ColorsTab = Window:CreateTab("Colors", "palette")
+local ExtraTab = Window:CreateTab("Extra", "sparkles")
+local SettingsTab = Window:CreateTab("Settings", "settings")
 
-function setRandomButton(text)
-    setElementText(randomButton, text)
-end
+HomeTab:CreateSection("✦ Welcome")
 
-function setPickupButton(text)
-    setElementText(pickupButton, text)
-end
+HomeTab:CreateParagraph({
+    Title = "hey " .. player.DisplayName .. " 👋",
+    Content = "welcome to OthHub. pick a tab on the left and go wild.\nif you see me ingame, say hi :)"
+})
 
-function setPickupPreview(text)
-    setElementText(pickupPreview, text)
-end
+HomeTab:CreateDivider()
 
-function setAhhhButton(text)
-    setElementText(ahhhButton, text)
-end
+HomeTab:CreateLabel("Press K to hide / show the UI", "keyboard")
+HomeTab:CreateLabel("Settings save automatically", "save")
+HomeTab:CreateLabel("othhub on top", "crown", Color3.fromRGB(196, 120, 255))
 
-function setAhhhStatus(text)
-    setElementText(ahhhStatus, text)
-end
-
-SlowTypeTab:CreateSection("Slow Type")
+SlowTypeTab:CreateSection("💬 Slow Type")
 
 local messageText = ""
 
 SlowTypeTab:CreateInput({
     Name = "Message",
-    PlaceholderText = "Type what you wanna say!",
+    PlaceholderText = "type what you wanna say...",
     RemoveTextAfterFocusLost = false,
     Callback = function(text)
         messageText = string.sub(tostring(text or ""), 1, MAX_PHRASE_LENGTH)
@@ -945,6 +974,10 @@ sayButton = SlowTypeTab:CreateButton({
         slowTypeMessage(messageText)
     end,
 })
+
+SlowTypeTab:CreateDivider()
+
+SlowTypeTab:CreateSection("🎲 Random Phrases")
 
 local categoryDropdown = SlowTypeTab:CreateDropdown({
     Name = "Phrase Category",
@@ -993,11 +1026,11 @@ randomButton = SlowTypeTab:CreateButton({
     end,
 })
 
-SlowTypeTab:CreateLabel("Maximum length: " .. tostring(MAX_PHRASE_LENGTH) .. " characters")
+SlowTypeTab:CreateLabel("Max length: " .. tostring(MAX_PHRASE_LENGTH) .. " characters", "info")
 
-PickupTab:CreateSection("Pickup Lines")
+PickupTab:CreateSection("💘 Pickup Lines")
 
-pickupPreview = PickupTab:CreateLabel("Press Random Pickup Line to preview.")
+pickupPreview = PickupTab:CreateLabel("Press Random Pickup Line to preview.", "eye")
 
 local pickupDropdown = PickupTab:CreateDropdown({
     Name = "Pickup Category",
@@ -1041,11 +1074,13 @@ pickupButton = PickupTab:CreateButton({
     end,
 })
 
-PickupTab:CreateLabel("Sends line 1 → waits → line 2 → ·")
+PickupTab:CreateDivider()
 
-ExtraTab:CreateSection("Extra")
+PickupTab:CreateLabel("Sends line 1 → waits → line 2 → ·", "info")
 
-ahhhStatus = ExtraTab:CreateLabel("Tool not added.")
+ExtraTab:CreateSection("✨ Extra")
+
+ahhhStatus = ExtraTab:CreateLabel("Tool not added.", "wrench")
 
 ahhhButton = ExtraTab:CreateButton({
     Name = "AHHHIMDYINGXD",
@@ -1055,14 +1090,17 @@ ahhhButton = ExtraTab:CreateButton({
             destroyFunnyTool()
             setAhhhButton("AHHHIMDYINGXD")
             setAhhhStatus("Tool removed.")
+            notify("AHHHIMDYINGXD", "Tool removed.", "trash-2")
             return
         end
 
         if createAHHHTool() then
             setAhhhButton("Remove Tool")
             setAhhhStatus("Tool added. Equip it to play.")
+            notify("AHHHIMDYINGXD", "Tool added. Equip it to play.", "check")
         else
             setAhhhStatus("Character is not ready.")
+            notify("AHHHIMDYINGXD", "Character is not ready.", "triangle-alert")
         end
     end,
 })
@@ -1072,7 +1110,7 @@ ExtraTab:CreateParagraph({
     Content = "Adds the original tool. Equip it after adding it."
 })
 
-ColorsTab:CreateSection("Player Soulmate Colors")
+ColorsTab:CreateSection("🎨 Soulmate Colors")
 
 colorsParagraph = ColorsTab:CreateParagraph({
     Title = "Players",
@@ -1083,21 +1121,22 @@ local function getPlayerColorText(targetPlayer)
     local gameData = targetPlayer:FindFirstChild("GameData")
 
     if not gameData then
-        return targetPlayer.DisplayName .. " @" .. targetPlayer.Name .. " — Loading..."
+        return "•  " .. targetPlayer.DisplayName .. " (@" .. targetPlayer.Name .. ")  —  loading..."
     end
 
     local soulmateColor = gameData:FindFirstChild("SoulmateColor")
 
     if not soulmateColor then
-        return targetPlayer.DisplayName .. " @" .. targetPlayer.Name .. " — Loading..."
+        return "•  " .. targetPlayer.DisplayName .. " (@" .. targetPlayer.Name .. ")  —  loading..."
     end
 
     local colorName = tostring(soulmateColor.Value)
 
-    return targetPlayer.DisplayName
-        .. " @"
+    return "•  "
+        .. targetPlayer.DisplayName
+        .. " (@"
         .. targetPlayer.Name
-        .. " — Soulmate Color: "
+        .. ")  —  "
         .. colorName
 end
 
@@ -1128,7 +1167,10 @@ end
 
 ColorsTab:CreateButton({
     Name = "Refresh Players",
-    Callback = refreshColors,
+    Callback = function()
+        refreshColors()
+        notify("Colors", "Player list refreshed.", "refresh-cw")
+    end,
 })
 
 Players.PlayerAdded:Connect(function()
@@ -1141,7 +1183,7 @@ Players.PlayerRemoving:Connect(function()
     refreshColors()
 end)
 
-SettingsTab:CreateSection("Settings")
+SettingsTab:CreateSection("⚙️ Typing")
 
 SettingsTab:CreateToggle({
     Name = "Typing dots (...)",
@@ -1176,6 +1218,10 @@ SettingsTab:CreateSlider({
     end,
 })
 
+SettingsTab:CreateDivider()
+
+SettingsTab:CreateSection("💘 Pickup Lines")
+
 SettingsTab:CreateSlider({
     Name = "Pickup Wait",
     Range = {0.25, 3},
@@ -1188,10 +1234,14 @@ SettingsTab:CreateSlider({
     end,
 })
 
-SettingsTab:CreateLabel("Dots appear before typing when enabled.")
-SettingsTab:CreateLabel("K toggles the Rayfield UI.")
+SettingsTab:CreateDivider()
+
+SettingsTab:CreateLabel("Dots appear before typing when enabled.", "info")
+SettingsTab:CreateLabel("K toggles the UI.", "keyboard")
 
 refreshColors()
 
 Rayfield:LoadConfiguration()
+
+notify("OthHub loaded ✦", "welcome back, " .. player.DisplayName .. ". press K to toggle.", "sparkles")
 
